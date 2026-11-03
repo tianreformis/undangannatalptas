@@ -5,27 +5,34 @@
 
 import { createHmac, timingSafeEqual } from 'node:crypto';
 
-const SESSION_SECRET = process.env.SESSION_SECRET;
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
-
-if (!SESSION_SECRET || SESSION_SECRET.length < 32) {
-    throw new Error('SESSION_SECRET must be set and at least 32 characters');
-}
-if (!ADMIN_PASSWORD) {
-    throw new Error('ADMIN_PASSWORD environment variable is not set');
-}
-
 const COOKIE_NAME = 'admin_session';
 const SESSION_TTL_MS = 12 * 60 * 60 * 1000; // 12 hours
 
 // In-memory login attempt tracking (best-effort, resets on cold start)
 const loginAttempts = new Map<string, { count: number; firstAttempt: number }>();
 
+// Lazy getters for env vars
+function getSessionSecret(): string {
+    const secret = process.env.SESSION_SECRET ?? '';
+    if (!secret || secret.length < 32) {
+        throw new Error('SESSION_SECRET must be set and at least 32 characters');
+    }
+    return secret;
+}
+
+function getAdminPassword(): string {
+    const pwd = process.env.ADMIN_PASSWORD ?? '';
+    if (!pwd) {
+        throw new Error('ADMIN_PASSWORD environment variable is not set');
+    }
+    return pwd;
+}
+
 /**
  * Sign a payload with HMAC-SHA256.
  */
 function sign(payload: string): string {
-    const signature = createHmac('sha256', SESSION_SECRET).update(payload).digest('hex');
+    const signature = createHmac('sha256', getSessionSecret()).update(payload).digest('hex');
     return `${payload}.${signature}`;
 }
 
@@ -38,7 +45,7 @@ function verify(signed: string): { valid: boolean; payload?: string } {
 
     const payload = signed.slice(0, idx);
     const signature = signed.slice(idx + 1);
-    const expected = createHmac('sha256', SESSION_SECRET).update(payload).digest('hex');
+    const expected = createHmac('sha256', getSessionSecret()).update(payload).digest('hex');
 
     // Use timingSafeEqual to prevent timing attacks
     const sigBuf = Buffer.from(signature, 'hex');
@@ -111,7 +118,7 @@ export function serializeSessionCookie(value: string, options: { maxAge?: number
  */
 export function verifyPassword(input: string): boolean {
     const inputBuf = Buffer.from(input, 'utf-8');
-    const expectedBuf = Buffer.from(ADMIN_PASSWORD, 'utf-8');
+    const expectedBuf = Buffer.from(getAdminPassword(), 'utf-8');
 
     if (inputBuf.length !== expectedBuf.length) {
         // Still do a comparison to avoid timing leak on length
@@ -179,3 +186,4 @@ export function getClientIp(req: Request): string {
     if (forwarded) return forwarded.split(',')[0].trim();
     return req.headers.get('x-real-ip') ?? 'unknown';
 }
+

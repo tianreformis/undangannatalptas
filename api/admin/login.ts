@@ -51,8 +51,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         res.setHeader('Set-Cookie', cookie);
         return res.status(200).json({ success: true, message: 'Login berhasil' });
-    } catch (err) {
+    } catch (err: any) {
         console.error('POST /api/admin/login error:', err);
-        return res.status(500).json({ error: 'Gagal login' });
+        return res.status(500).json({ error: err.message ?? 'Gagal login' });
     }
 }
