@@ -18,19 +18,29 @@ async function handleSubmit() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ password: password.value }),
+            credentials: 'include', // Important for cookies
         })
+
+        const contentType = res.headers.get('content-type')
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await res.text()
+            console.error('Non-JSON response:', text)
+            error.value = `Server error (${res.status}): ${text.slice(0, 200)}`
+            return
+        }
 
         const data = await res.json()
 
         if (!res.ok) {
-            error.value = data.error ?? 'Login gagal'
+            error.value = data.error ?? `Login gagal (${res.status})`
             return
         }
 
         const redirect = route.query.redirect as string || '/admin'
         router.push(redirect)
-    } catch {
-        error.value = 'Terjadi kesalahan jaringan. Silakan coba lagi.'
+    } catch (err) {
+        console.error('Login fetch error:', err)
+        error.value = `Kesalahan jaringan: ${err.message}. Cek console (F12) untuk detail.`
     } finally {
         loading.value = false
     }
