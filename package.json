@@ -1,0 +1,31 @@
+{
+  "name": "undangan-natal-perkantas",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
+  "description": "Undangan digital Perayaan Natal Perkantas dengan Admin Panel & RSVP (Vue 3 + Vite + Tailwind + Vercel Serverless + Neon Postgres)",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "migrate": "node scripts/migrate.mjs",
+    "vercel:dev": "vercel dev"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^0.10.0",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@vercel/node": "^5.0.0",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "autoprefixer": "^10.4.20",
+    "dotenv": "^16.4.0",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vite": "^6.0.7"
+  }
+}

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Perkantas">
+  <rect width="64" height="64" rx="14" fill="#10291f" />
+  <path
+    d="M32 12l5.2 12.7 13.6 1-10.4 9 3.3 13.3L32 41.2 19.3 48l3.3-13.3-10.4-9 13.6-1z"
+    fill="#d9b64a"
+  />
+</svg>

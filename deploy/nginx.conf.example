@@ -1,0 +1,37 @@
+# Contoh konfigurasi nginx untuk SPA Vue Router (mode history).
+# Salin ke /etc/nginx/sites-available/undangan-natal lalu sesuaikan domain & root.
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name undangan.perkantas.org;
+
+    root /var/www/undangan-natal;
+    index index.html;
+
+    # Semua rute (/budi-santoso, /generator, dst.) dilayani index.html
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Aset statis boleh di-cache lama karena namanya ber-hash.
+    location /assets/ {
+        try_files $uri =404;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    location ~* \.(?:png|jpg|jpeg|svg|webp|ico|mp3|woff2?)$ {
+        try_files $uri =404;
+        expires 30d;
+        add_header Cache-Control "public";
+    }
+
+    # HTML tidak di-cache agar update undangan langsung terlihat.
+    location = /index.html {
+        add_header Cache-Control "no-cache, no-store, must-revalidate";
+    }
+
+    gzip on;
+    gzip_types text/css application/javascript application/json image/svg+xml audio/mpeg;
+}
